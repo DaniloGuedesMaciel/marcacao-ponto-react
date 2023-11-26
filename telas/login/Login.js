@@ -1,61 +1,86 @@
-import React, {useState, useEffect} from "react";
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, Dimensions } from "react-native";
-
-import {ValidarCadastro} from './validarLogin';
-
+import React, { useState } from "react";
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, Dimensions, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 import Background from "../../assets/components/Background";
 
 const largura = Dimensions.get('screen').width;
 
-export default function Login(){
-    const navigation = useNavigation();
+const FormularioValidado = () => {
+  const navigation = useNavigation();
+  const [dadosFormulario, setDadosFormulario] = useState({
+    usuario: '',
+    senha: '',
+  });
 
-    const [usuario, setUsuario] = useState('');
-    const [senha, setSenha] = useState('');
+  const [dadosRecebidos, setDadosRecebidos] = useState([
+    {usuario: 'ja', senha: '123456'},
+    {usuario: 'teste', senha: '123456'},
+    {usuario: 'dan', senha: 'saulve'},
+  ]);
 
-    const handleSubmit = async () => {
-        // Valida os dados do formulário
-     try{
-        const valido = await ValidarCadastro(usuario, senha);
-      
-        if (valido) {
-            navigation.navigate('ponto')
-        } else {
-          alert('Os dados do formulário são inválidos.');
-        }
-     }catch(erro){
-        console.log('Erro ao lidar com a promisse', erro);
-     }
-            
-    }  
-    
-    return(
-        <>
-            <Background cor='#F2E8E8' />
-            <View>
-            <View style={estilo.container}>
-                        <TextInput placeholder="Usuário" 
-                        value={usuario}
-                        onChangeText={(text) => setUsuario(text)}
-                        style={estilo.input}/>
+  // Dicionário de regras de validação
+  const regrasValidacao = {
+    usuario: (valor) => valor.length > 0, // Exemplo: usuário deve ter pelo menos 1 caractere
+    senha: (valor) => valor.length >= 6, // Exemplo: senha deve ter pelo menos 6 caracteres
+  };
 
-                        <TextInput placeholder="Senha" 
-                        value={senha}
-                        onChangeText={(text) => setSenha(text)}
-                        style={estilo.input}
-                        secureTextEntry={true}
-                    />
-                    <View style={estilo.containerBotao}>
-                    <TouchableOpacity style={estilo.botao} onPress={handleSubmit}>
-                        <Text style={estilo.texto}>Prosseguir</Text>
-                    </TouchableOpacity>
-                    </View>
-                </View>
-            </View>
-            </>
+  const handleSubmit = () => {
+    // Verificar as regras de validação
+    for (const campo in dadosFormulario) {
+      const valor = dadosFormulario[campo];
+      const regraValidacao = regrasValidacao[campo];
+
+      if (regraValidacao && !regraValidacao(valor)) {
+        Alert.alert('Erro de validação', `Campos inválidos`);
+        return; // Se um campo não atender à validação, interrompe imediatamente o processo
+      }
+    }
+
+    // Se o loop terminar sem retornar, significa que todos os campos passaram na validação
+    const encontrouCorrespondencia = dadosRecebidos.some(
+      (dados) =>
+        dados.usuario === dadosFormulario.usuario &&
+        dados.senha === dadosFormulario.senha
     );
+
+    if (encontrouCorrespondencia) {
+      navigation.navigate('ponto');
+    } else {
+      Alert.alert('Erro', 'Os dados digitados são inválidos.');
+    }
+  };
+
+
+  return (
+    <>
+      <Background cor='#F2E8E8' />
+      <View>
+        <View style={estilo.container}>
+          <TextInput
+            placeholder="Usuário"
+            value={dadosFormulario.usuario}
+            onChangeText={(text) => setDadosFormulario({ ...dadosFormulario, usuario: text })}
+            style={estilo.input}
+          />
+
+          <TextInput
+            placeholder="Senha"
+            value={dadosFormulario.senha}
+            onChangeText={(text) => setDadosFormulario({ ...dadosFormulario, senha: text })}
+            style={estilo.input}
+            secureTextEntry={true}
+          />
+
+          <View style={estilo.containerBotao}>
+            <TouchableOpacity style={estilo.botao} onPress={handleSubmit}>
+              <Text style={estilo.texto}>Prosseguir</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </>
+  );
 }
 
 const estilo = StyleSheet.create({
@@ -91,3 +116,5 @@ const estilo = StyleSheet.create({
         lineHeight: 26
     }
 })
+
+export default FormularioValidado;

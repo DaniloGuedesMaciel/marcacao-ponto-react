@@ -2,7 +2,7 @@ import React, {useState, useEffect} from "react";
 import { Text, View, StyleSheet, Dimensions } from "react-native";
 
 import { format } from "date-fns";
-import ptBR from "date-fns/locale/pt-BR";
+
 
 const largura = Dimensions.get('screen').width;
 

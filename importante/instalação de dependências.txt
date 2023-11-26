@@ -1,0 +1,16 @@
+Instalação na maquina:
+
+Instalar o node.js e baixar o Aplicatino na PlayStore Expo GO
+
+Abrir o prompt de comando e digitar o seguinte comando:
+npm install --global expo-cli
+
+Caso o projeto apresente algum erro, instalar as seguintes dependências dentro da pasta do projeto:
+
+npm install @react-navigation/native-stack
+npm install date-fns
+
+Após toda a configuração, no terminal do VS CODE, escrever o seguinte comando e Scannear o QR CODE que será exibido:
+
+npx expo start
+
